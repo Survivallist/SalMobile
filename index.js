@@ -8,8 +8,8 @@ const port = 3000;
 app.use(express.json());
 
 app.post('/', async (req, res) => {
-    const e = "e254989";
-    const password = "flazu66.100%";
+    const e = req.body.e;
+    const password = req.body.password;
 
     const browser = await puppeteer.launch({
         headless: true,
