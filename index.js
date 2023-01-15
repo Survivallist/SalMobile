@@ -28,6 +28,12 @@ app.post('/', async (req, res) => {
         visible: true
     });
 
+    if (page.url() === "https://sal.portal.bl.ch/sekow/index.php?login")
+    {
+        res.send("failed")
+        return;
+    }
+
     await page.click("[id=menu21311]");
 
     await page.waitForSelector("img ", {
@@ -129,7 +135,6 @@ app.post('/', async (req, res) => {
     await browser.close();
 
     res.send(marks);
-
 })
 
 app.listen(port, () => {
