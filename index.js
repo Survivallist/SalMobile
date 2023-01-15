@@ -7,8 +7,8 @@ const port = 3000;
 
 
 app.post('/', async (req, res) => {
-    const e = req.body.e
-    const password = req.body.password;
+    const e = "e254989"
+    const password = "flazu66.100%
     
     const browser = await puppeteer.launch({
         headless: true,
