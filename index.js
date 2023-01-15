@@ -5,11 +5,12 @@ const {convert} = require("html-to-text");
 
 const port = 3000;
 
+app.use(express.json());
 
 app.post('/', async (req, res) => {
     const e = req.body.e;
     const password = req.body.password;
-    
+
     const browser = await puppeteer.launch({
         headless: true,
         args: ['--no-sandbox']
@@ -126,7 +127,9 @@ app.post('/', async (req, res) => {
     });
 
     await browser.close();
+
     res.send(marks);
+
 })
 
 app.listen(port, () => {
