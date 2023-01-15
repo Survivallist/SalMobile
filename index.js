@@ -8,9 +8,9 @@ const port = 3000;
 
 app.get('/', async (req, res) => {
     const browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox']
-        });
+        headless: true,
+        args: ['--no-sandbox']
+    });
     const page = await browser.newPage();
 
     await page.goto("https://sal.portal.bl.ch/sekow/index.php?login");
@@ -94,9 +94,16 @@ app.get('/', async (req, res) => {
 
     function getDetails(string){
         let details = {}
-        details["schnitt"] = string.split("\n")[1].split(" ")[string.split("\n")[1].split(" ").length - 1];
-        details["fach"] = string.split("\n")[1].replace(" " + details["schnitt"], "");
-        details["bestatigt"] = (string.split("\n")[4] === "ja");
+        if(string.split("\n")[1] !== undefined)
+        {
+            details["schnitt"] = string.split("\n")[1].split(" ")[string.split("\n")[1].split(" ").length - 1];
+            details["fach"] = string.split("\n")[1].replace(" " + details["schnitt"], "");
+            details["bestatigt"] = (string.split("\n")[4] === "ja");
+        }
+        else
+        {
+            console.log(string);
+        }
         return details;
     }
 
