@@ -7,7 +7,10 @@ const port = 3000;
 
 
 app.get('/', async (req, res) => {
-    const browser = await puppeteer.launch({headless: true});
+    const browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox']
+        });
     const page = await browser.newPage();
 
     await page.goto("https://sal.portal.bl.ch/sekow/index.php?login");
