@@ -1,24 +1,21 @@
 {
-  "name": "starter-express-api",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "sal",
+  "description": "Sal App",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/cyclic-software/starter-express-api.git"
+  "engines": {
+    "node": "14.x"
   },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/cyclic-software/starter-express-api/issues"
-  },
-  "homepage": "https://github.com/cyclic-software/starter-express-api#readme",
+  "main": "index.js",
   "dependencies": {
-    "express": "^4.17.1",
+    "cryptojs": "^2.5.3",
+    "express": "^4.18.2",
     "html-to-text": "^9.0.3",
     "puppeteer": "^19.5.2"
+  },
+  "private": true,
+  "devDependencies": {
+    "@vercel/node": "^2.8.6"
   }
 }
