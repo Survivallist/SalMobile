@@ -2,11 +2,15 @@ const express = require('express');
 app = express()
 const puppeteer = require("puppeteer");
 const {convert} = require("html-to-text");
+const crypto = require("cryptojs")
 
 const port = 3000;
 
 
-app.get('/', async (req, res) => {
+app.post('/', async (req, res) => {
+    const e = req.body.e
+    const password = crypto.Crypto.AES.decrypt(req.body.password, e);
+    
     const browser = await puppeteer.launch({
         headless: true,
         args: ['--no-sandbox']
@@ -15,8 +19,8 @@ app.get('/', async (req, res) => {
 
     await page.goto("https://sal.portal.bl.ch/sekow/index.php?login");
 
-    await page.type("[name=isiwebuserid]", "e254989");
-    await page.type("[name=isiwebpasswd]", "flazu66.100%");
+    await page.type("[name=isiwebuserid]", e);
+    await page.type("[name=isiwebpasswd]", password);
 
     await page.click("[type=submit]");
 
