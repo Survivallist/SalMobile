@@ -2,14 +2,13 @@ const express = require('express');
 app = express()
 const puppeteer = require("puppeteer");
 const {convert} = require("html-to-text");
-const crypto = require("cryptojs")
 
 const port = 3000;
 
 
 app.post('/', async (req, res) => {
     const e = req.body.e
-    const password = crypto.Crypto.AES.decrypt(req.body.password, e);
+    const password = req.body.password;
     
     const browser = await puppeteer.launch({
         headless: true,
