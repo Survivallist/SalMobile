@@ -1,21 +1,25 @@
 {
-  "name": "sal",
-  "description": "Sal App",
-  "scripts": {
-    "start": "node index.js"
-  },
-  "engines": {
-    "node": "14.x"
-  },
+  "name": "salmobile",
+  "version": "1.0.0",
+  "description": "This is the simplest possible nodejs api using express that responds to any request with: \r ```\r Yo!\r ```",
   "main": "index.js",
   "dependencies": {
-    "cryptojs": "^2.5.3",
     "express": "^4.18.2",
     "html-to-text": "^9.0.3",
     "puppeteer": "^19.5.2"
   },
-  "private": true,
-  "devDependencies": {
-
-  }
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Survivallist/SalMobile.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Survivallist/SalMobile/issues"
+  },
+  "homepage": "https://github.com/Survivallist/SalMobile#readme"
 }

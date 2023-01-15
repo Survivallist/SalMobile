@@ -6,9 +6,9 @@ const {convert} = require("html-to-text");
 const port = 3000;
 
 
-app.post('/', async (req, res) => {
+app.get('/', async (req, res) => {
     const e = "e254989"
-    const password = "flazu66.100%
+    const password = "flazu66.100%"
     
     const browser = await puppeteer.launch({
         headless: true,
