@@ -7,7 +7,7 @@ const port = 3000;
 
 app.use(express.json());
 
-app.post('/', async (req, res) => {
+app.post('/getMarks', async (req, res) => {
     const e = req.body.e;
     const password = req.body.password;
 
@@ -135,6 +135,34 @@ app.post('/', async (req, res) => {
     await browser.close();
 
     res.send(marks);
+})
+
+app.post('/isUser', async (req, res) => {
+    const e = req.body.e;
+    const password = req.body.password;
+
+    const browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox']
+    });
+    const page = await browser.newPage();
+
+    await page.goto("https://sal.portal.bl.ch/sekow/index.php?login");
+
+    await page.type("[name=isiwebuserid]", e);
+    await page.type("[name=isiwebpasswd]", password);
+
+    await page.click("[type=submit]");
+
+    await page.waitForSelector("img ", {
+        visible: true
+    });
+
+    let url = page.url()
+
+    await browser.close();
+
+    res.send(url  !== "https://sal.portal.bl.ch/sekow/index.php?login");
 })
 
 app.listen(port, () => {
