@@ -155,6 +155,7 @@ app.post('/isUser', async (req, res) => {
         headless: true,
         args: ['--no-sandbox']
     });
+
     const page = await browser.newPage();
 
     await page.goto("https://sal.portal.bl.ch/" + school  + "/index.php?login");
