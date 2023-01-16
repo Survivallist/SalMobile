@@ -148,6 +148,7 @@ app.post('/getMarks', async (req, res) => {
 app.post('/isUser', async (req, res) => {
     const e = req.body.e;
     const password = req.body.password;
+    const school = req.body.school;
 
     const browser = await puppeteer.launch({
         headless: true,
@@ -155,7 +156,7 @@ app.post('/isUser', async (req, res) => {
     });
     const page = await browser.newPage();
 
-    await page.goto("https://sal.portal.bl.ch/sekow/index.php?login");
+    await page.goto("https://sal.portal.bl.ch/" + school  + "/index.php?login");
 
     if(e !== undefined && e !== null && password !== undefined && password !== null)
     {
