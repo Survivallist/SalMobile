@@ -19,8 +19,16 @@ app.post('/getMarks', async (req, res) => {
 
     await page.goto("https://sal.portal.bl.ch/sekow/index.php?login");
 
-    await page.type("[name=isiwebuserid]", e);
-    await page.type("[name=isiwebpasswd]", password);
+    if(e !== undefined && e !== null && password !== undefined && password !== null)
+    {
+        await page.type("[name=isiwebuserid]", e);
+        await page.type("[name=isiwebpasswd]", password);
+    }
+    else
+    {
+        res.send("failed")
+        return;
+    }
 
     await page.click("[type=submit]");
 
@@ -149,8 +157,16 @@ app.post('/isUser', async (req, res) => {
 
     await page.goto("https://sal.portal.bl.ch/sekow/index.php?login");
 
-    await page.type("[name=isiwebuserid]", e);
-    await page.type("[name=isiwebpasswd]", password);
+    if(e !== undefined && e !== null && password !== undefined && password !== null)
+    {
+        await page.type("[name=isiwebuserid]", e);
+        await page.type("[name=isiwebpasswd]", password);
+    }
+    else
+    {
+        res.send(false)
+        return;
+    }
 
     await page.click("[type=submit]");
 
