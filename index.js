@@ -18,7 +18,7 @@ app.post('/getMarks', async (req, res) => {
     });
     const page = await browser.newPage();
 
-    await page.goto("https://sal.portal.bl.ch/sekow/index.php?login");
+    await page.goto("https://sal.portal.bl.ch/" + school + "/index.php?login");
 
     if(e !== undefined && e !== null && password !== undefined && password !== null)
     {
@@ -180,7 +180,7 @@ app.post('/isUser', async (req, res) => {
 
     await browser.close();
 
-    res.send(url  !== "https://sal.portal.bl.ch/sekow/index.php?login");
+    res.send(url  !== "https://sal.portal.bl.ch/" + school + "/index.php?login");
 })
 
 app.listen(port, () => {
