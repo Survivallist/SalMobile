@@ -10,6 +10,7 @@ app.use(express.json());
 app.post('/getMarks', async (req, res) => {
     const e = req.body.e;
     const password = req.body.password;
+    const school = req.body.school;
 
     const browser = await puppeteer.launch({
         headless: true,
@@ -36,7 +37,7 @@ app.post('/getMarks', async (req, res) => {
         visible: true
     });
 
-    if (page.url() === "https://sal.portal.bl.ch/sekow/index.php?login")
+    if (page.url() === "https://sal.portal.bl.ch/" + school + "/index.php?login")
     {
         res.send("failed")
         return;
