@@ -33,17 +33,18 @@ app.post('/getMarks', async (req, res) => {
 
     await page.click("[type=submit]");
 
-    await page.waitForResponse(response => response.status() === 200)
+    await page.waitForSelector("#menu21311")
 
     if (page.url() === "https://sal.portal.bl.ch/" + school + "/index.php?login")
     {
+        await page.screenshot()
         res.send("failed")
         return;
     }
 
     await page.click("[id=menu21311]");
 
-    await page.waitForResponse(response => response.status() === 200)
+    await page.waitForSelector(".mdl-data-table mdl-js-data-table mdl-table--listtable")
 
     let temp = await page.evaluate(() => {
         let data = [];
@@ -171,7 +172,7 @@ app.post('/isUser', async (req, res) => {
 
     await page.click("[type=submit]");
 
-    await page.waitForResponse(response => response.status() === 200)
+    await page.waitForSelector("#menu21311")
 
     let url = page.url()
 
