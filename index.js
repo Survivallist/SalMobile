@@ -55,6 +55,8 @@ app.post('/getMarks', async (req, res) => {
         return data;
     });
 
+    console.log(temp[0])
+
     let values = convert(temp[0], {wordwrap: 130});
 
     values = values.replace("Kurs Notendurchschnitt Bestätigt ", "");
