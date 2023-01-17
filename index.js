@@ -33,7 +33,7 @@ app.post('/getMarks', async (req, res) => {
 
     await page.click("[type=submit]");
 
-    await page.waitForNavigation();
+    await page.waitForSelector(" img")
 
     if (page.url() === "https://sal.portal.bl.ch/" + school + "/index.php?login")
     {
@@ -44,7 +44,7 @@ app.post('/getMarks', async (req, res) => {
 
     await page.click("[id=menu21311]");
 
-    await page.waitForNavigation();
+    await new Promise(r => setTimeout(r, 2000))
 
     let temp = await page.evaluate(() => {
         let data = [];
@@ -53,8 +53,6 @@ app.post('/getMarks', async (req, res) => {
             data.push(element.innerHTML);
         return data;
     });
-
-    console.log(":" + temp[0])
 
     let values = convert(temp[0], {wordwrap: 130});
 
@@ -172,7 +170,7 @@ app.post('/isUser', async (req, res) => {
 
     await page.click("[type=submit]");
 
-    await page.waitForNavigation();
+    await page.waitForSelector(" img")
 
     let url = page.url()
 
