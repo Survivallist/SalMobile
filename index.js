@@ -33,7 +33,7 @@ app.post('/getMarks', async (req, res) => {
 
     await page.click("[type=submit]");
 
-    await page.waitForSelector("#menu21311")
+    await page.waitForNavigation();
 
     if (page.url() === "https://sal.portal.bl.ch/" + school + "/index.php?login")
     {
@@ -44,7 +44,7 @@ app.post('/getMarks', async (req, res) => {
 
     await page.click("[id=menu21311]");
 
-    await page.waitForSelector(".mdl-data-table mdl-js-data-table mdl-table--listtable")
+    await page.waitForNavigation();
 
     let temp = await page.evaluate(() => {
         let data = [];
@@ -172,7 +172,7 @@ app.post('/isUser', async (req, res) => {
 
     await page.click("[type=submit]");
 
-    await page.waitForSelector("#menu21311")
+    await page.waitForNavigation();
 
     let url = page.url()
 
