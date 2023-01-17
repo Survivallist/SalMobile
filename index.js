@@ -45,7 +45,7 @@ app.post('/getMarks', async (req, res) => {
 
     await page.click("[id=menu21311]");
 
-    await page.waitForSelector("img ", {
+    await page.waitForSelector(".mdl-data-table mdl-js-data-table mdl-table--listtable", {
         visible: true
     });
 
@@ -172,10 +172,6 @@ app.post('/isUser', async (req, res) => {
     }
 
     await page.click("[type=submit]");
-
-    await page.waitForSelector("img ", {
-        visible: true
-    });
 
     let url = page.url()
 
