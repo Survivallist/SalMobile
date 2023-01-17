@@ -45,9 +45,7 @@ app.post('/getMarks', async (req, res) => {
 
     await page.click("[id=menu21311]");
 
-    await page.waitForSelector(".mdl-data-table mdl-js-data-table mdl-table--listtable", {
-        visible: true
-    });
+    await page.waitForResponse(response => response.status() === 200)
 
     let temp = await page.evaluate(() => {
         let data = [];
@@ -172,6 +170,8 @@ app.post('/isUser', async (req, res) => {
     }
 
     await page.click("[type=submit]");
+
+    await page.waitForResponse(response => response.status() === 200)
 
     let url = page.url()
 
