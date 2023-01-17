@@ -33,9 +33,7 @@ app.post('/getMarks', async (req, res) => {
 
     await page.click("[type=submit]");
 
-    await page.waitForSelector("img ", {
-        visible: true
-    });
+    await page.waitForResponse(response => response.status() === 200)
 
     if (page.url() === "https://sal.portal.bl.ch/" + school + "/index.php?login")
     {
