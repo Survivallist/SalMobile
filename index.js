@@ -37,7 +37,6 @@ app.post('/getMarks', async (req, res) => {
 
     if (page.url() === "https://sal.portal.bl.ch/" + school + "/index.php?login")
     {
-        await page.screenshot()
         res.send("failed")
         return;
     }
@@ -45,6 +44,12 @@ app.post('/getMarks', async (req, res) => {
     await page.click("[id=menu21311]");
 
     await new Promise(r => setTimeout(r, 2000))
+
+    if (!page.url().includes("pageid=21311"))
+    {
+        res.send("failed")
+        return;
+    }
 
     let temp = await page.evaluate(() => {
         let data = [];
