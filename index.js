@@ -259,6 +259,7 @@ app.listen(port, async () => {
         for (const users1 of JSON.parse(JSON.stringify(users))) {
             loadedMarks[users1.e] = (await getMarks(users1.e, users1.password, users1.school, true))
         }
+        console.log("Reloaded")
     })
     users = await JSON.parse(fs.readFileSync("./users.json", "utf8"));
     for (const users1 of JSON.parse(JSON.stringify(users))) {
