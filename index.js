@@ -2,15 +2,29 @@ const express = require('express');
 app = express()
 const puppeteer = require("puppeteer");
 const {convert} = require("html-to-text");
+const schedule = require("node-schedule");
+const fs = require("fs")
 
 const port = 3000;
 
 app.use(express.json());
 
-app.post('/getMarks', async (req, res) => {
-    const e = req.body.e;
-    const password = req.body.password;
-    const school = req.body.school;
+let users = JSON.parse(fs.readFileSync("./users.json", "utf8"));
+
+let loadedMarks = {}
+
+async function getMarks(e, password, school, reload=false)
+{
+    if(!reload)
+    {
+        if(Object.keys(loadedMarks) !== undefined)
+        {
+            if(Object.keys(loadedMarks).includes(e))
+            {
+                return loadedMarks[e];
+            }
+        }
+    }
 
     const browser = await puppeteer.launch({
         headless: true,
@@ -27,8 +41,7 @@ app.post('/getMarks', async (req, res) => {
     }
     else
     {
-        res.send("failed")
-        return;
+        return "failed";
     }
 
     await page.click("[type=submit]");
@@ -37,8 +50,7 @@ app.post('/getMarks', async (req, res) => {
 
     if (page.url() === "https://sal.portal.bl.ch/" + school + "/index.php?login")
     {
-        res.send("failed")
-        return;
+        return "failed";
     }
 
     await page.click("[id=menu21311]");
@@ -47,8 +59,7 @@ app.post('/getMarks', async (req, res) => {
 
     if (!page.url().includes("pageid=21311"))
     {
-        res.send("failed")
-        return;
+        return "failed";
     }
 
     let temp = await page.evaluate(() => {
@@ -145,13 +156,12 @@ app.post('/getMarks', async (req, res) => {
 
     await browser.close();
 
-    res.send(marks);
-})
+    loadedMarks[e] = marks;
 
-app.post('/isUser', async (req, res) => {
-    const e = req.body.e;
-    const password = req.body.password;
-    const school = req.body.school;
+    return marks;
+}
+
+async function isUser(e, password, school){
 
     const browser = await puppeteer.launch({
         headless: true,
@@ -169,8 +179,7 @@ app.post('/isUser', async (req, res) => {
     }
     else
     {
-        res.send(false)
-        return;
+        return false;
     }
 
     await page.click("[type=submit]");
@@ -181,9 +190,71 @@ app.post('/isUser', async (req, res) => {
 
     await browser.close();
 
-    res.send(url  !== "https://sal.portal.bl.ch/" + school + "/index.php?login");
+    const isUser = (url  !== "https://sal.portal.bl.ch/" + school + "/index.php?login")
+
+    if(Object.keys(users) !== undefined)
+    {
+        if(!(users.some(obj => obj.e === e) && users.some(obj => obj.password === password) && users.some(obj => obj.school === school))) {
+            if(isUser)
+            {
+                users.push({
+                    e: e,
+                    password: password,
+                    school: school
+                })
+                const jsonString = JSON.stringify(users)
+                fs.writeFile('./users.json', jsonString, () => {
+                })
+            }
+        }
+    }
+
+    return isUser;
+}
+
+app.post('/getMarks', async (req, res) => {
+    const e = req.body.e;
+    const password = req.body.password;
+    const school = req.body.school;
+
+    let marks = await getMarks(e, password, school)
+
+    res.send(marks);
 })
 
-app.listen(port, () => {
-    console.log("Example app listening on port " + port);
+app.post('/isKnown', async (req, res) => {
+    const e = req.body.e;
+    const password = req.body.password;
+    const school = req.body.school;
+    res.send(users.some(obj => obj.e === e) && users.some(obj => obj.password === password) && users.some(obj => obj.school === school));
+})
+
+app.post('/isUser', async (req, res) => {
+    const e = req.body.e;
+    const password = req.body.password;
+    const school = req.body.school;
+
+    let val = await isUser(e, password, school);
+
+    res.send(val);
+})
+
+app.get("/reload", async (req, res) => {
+    users = await JSON.parse(fs.readFileSync("./users.json", "utf8"));
+    for (const users1 of JSON.parse(JSON.stringify(users))) {
+        loadedMarks[users1.e] = (await getMarks(users1.e, users1.password, users1.school, true))
+    }
+    res.send("success")
+})
+
+app.listen(port, async () => {
+
+    schedule.scheduleJob("0 */12 * * *", () => {
+
+    })
+    users = await JSON.parse(fs.readFileSync("./users.json", "utf8"));
+    for (const users1 of JSON.parse(JSON.stringify(users))) {
+        loadedMarks[users1.e] = (await getMarks(users1.e, users1.password, users1.school, true))
+    }
+    console.log("Server listening on port " + port);
 });
