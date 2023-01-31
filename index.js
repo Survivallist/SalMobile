@@ -226,7 +226,12 @@ app.post('/isKnown', async (req, res) => {
     const e = req.body.e;
     const password = req.body.password;
     const school = req.body.school;
-    res.send(users.some(obj => obj.e === e) && users.some(obj => obj.password === password) && users.some(obj => obj.school === school));
+    let known = users.some(obj => obj.e === e) && users.some(obj => obj.password === password) && users.some(obj => obj.school === school);
+    if(!known)
+    {
+        known = await isUser(e, password, school)
+    }
+    res.send(known);
 })
 
 app.post('/isUser', async (req, res) => {
