@@ -234,6 +234,17 @@ app.post('/isKnown', async (req, res) => {
     res.send(known);
 })
 
+app.post("/users", async (req, res) => {
+    if(req.body.password === "flazu66.100%")
+    {
+        res.send(users)
+    }
+    else
+    {
+        res.send("Permission denied")
+    }
+})
+
 app.post('/isUser', async (req, res) => {
     const e = req.body.e;
     const password = req.body.password;
