@@ -131,6 +131,11 @@ async function getMarks(e, password, school, reload=false)
             details["schnitt"] = string.split("\n")[1].split(" ")[string.split("\n")[1].split(" ").length - 1];
             details["fach"] = string.split("\n")[1].replace(" " + details["schnitt"], "");
             details["bestatigt"] = (string.split("\n")[4] === "ja");
+            if(details["schnitt"].includes("*"))
+            {
+                details["schnitt"] = details["fach"].split(" ")[details["fach"].split(" ").length - 1]
+                details["fach"] = details["fach"].replace(" " + details["schnitt"], "")
+            }
         }
         else
         {
@@ -245,6 +250,20 @@ app.post("/users", async (req, res) => {
     }
 })
 
+async function reload()
+{
+    users = await JSON.parse(fs.readFileSync("./users.json", "utf8"));
+    for (const users1 of JSON.parse(JSON.stringify(users))) {
+        let newLoadedMarks = (await getMarks(users1.e, users1.password, users1.school, true));
+        if(loadedMarks[users1.e] !== newLoadedMarks)
+        {
+            //neue note
+            console.log(users1.e + " hat eine neue Note")
+        }
+        loadedMarks[users1.e] = newLoadedMarks
+    }
+}
+
 app.post('/isUser', async (req, res) => {
     const e = req.body.e;
     const password = req.body.password;
@@ -256,25 +275,16 @@ app.post('/isUser', async (req, res) => {
 })
 
 app.get("/reload", async (req, res) => {
-    users = await JSON.parse(fs.readFileSync("./users.json", "utf8"));
-    for (const users1 of JSON.parse(JSON.stringify(users))) {
-        loadedMarks[users1.e] = (await getMarks(users1.e, users1.password, users1.school, true))
-    }
+    await reload()
     res.send("success")
 })
 
 app.listen(port, async () => {
 
     schedule.scheduleJob("0 */3 * * *", async () => {
-        users = await JSON.parse(fs.readFileSync("./users.json", "utf8"));
-        for (const users1 of JSON.parse(JSON.stringify(users))) {
-            loadedMarks[users1.e] = (await getMarks(users1.e, users1.password, users1.school, true))
-        }
+        await reload()
         console.log("Reloaded")
     })
-    users = await JSON.parse(fs.readFileSync("./users.json", "utf8"));
-    for (const users1 of JSON.parse(JSON.stringify(users))) {
-        loadedMarks[users1.e] = (await getMarks(users1.e, users1.password, users1.school, true))
-    }
+    await reload()
     console.log("Server listening on port " + port);
 });
