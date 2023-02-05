@@ -133,8 +133,9 @@ async function getMarks(e, password, school, reload=false)
             details["bestatigt"] = (string.split("\n")[4] === "ja");
             if(details["schnitt"].includes("*"))
             {
-                details["schnitt"] = details["fach"].split(" ")[details["fach"].split(" ").length - 1] + "*"
+                details["schnitt"] = details["fach"].split(" ")[details["fach"].split(" ").length - 1]
                 details["fach"] = details["fach"].replace(" " + details["schnitt"], "")
+                details["schnitt"] += "*"
             }
         }
         else
