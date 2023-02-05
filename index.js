@@ -114,6 +114,11 @@ async function getMarks(e, password, school, reload=false)
 
         tests.forEach(info => {
             let infoNice = {}
+            if(info.endsWith(" "))
+            {
+                info = info.substring(0, info.length - 1);
+                console.log("'" + info + "'")
+            }
             infoNice["datum"] = info.split(" ")[0];
             infoNice["note"] = info.split(" ")[info.split(" ").length - 2]
             infoNice["gewicht"] = info.split(" ")[info.split(" ").length - 1]
