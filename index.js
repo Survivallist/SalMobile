@@ -13,8 +13,7 @@ let users = JSON.parse(fs.readFileSync("./users.json", "utf8"));
 
 let loadedMarks = {}
 
-async function getMarks(e, password, school, reload=false)
-{
+async function getMarks(e, password, school, reload=false) {
     if(!reload)
     {
         if(Object.keys(loadedMarks) !== undefined)
@@ -117,7 +116,6 @@ async function getMarks(e, password, school, reload=false)
             if(info.endsWith(" "))
             {
                 info = info.substring(0, info.length - 1);
-                console.log("'" + info + "'")
             }
             infoNice["datum"] = info.split(" ")[0];
             infoNice["note"] = info.split(" ")[info.split(" ").length - 2]
@@ -143,10 +141,6 @@ async function getMarks(e, password, school, reload=false)
                 details["schnitt"] += "*"
             }
         }
-        else
-        {
-            console.log(string);
-        }
         return details;
     }
 
@@ -166,6 +160,31 @@ async function getMarks(e, password, school, reload=false)
     });
 
     await browser.close();
+
+    if(loadedMarks[e] !== undefined)
+    {
+        Object.keys(marks).forEach(fach => {
+            if(loadedMarks[e][fach]["bestatigt"] === false || marks[fach]["bestatigt"] === false)
+            {
+                if(loadedMarks[e][fach]["noten"].length < marks[fach]["noten"].length)
+                {
+                    //Push-Notification senden
+                    console.log(e + " hat eine neue Note im Fach " + fach)
+                }
+                else if(loadedMarks[e][fach]["schnitt"] !== marks[fach]["schnitt"])
+                {
+                    //Push-Notification senden
+                    console.log(e + " wurde die Note geändert im Fach " + fach)
+                }
+            }
+            if(!loadedMarks[e][fach]["schnitt"].endsWith("*") && marks[fach]["schnitt"].endsWith("*"))
+            {
+                //Push-Notification senden
+                console.log(e + " hat ein neues Sternchen im Fach " + fach)
+            }
+        })
+    }
+
 
     loadedMarks[e] = marks;
 
@@ -256,6 +275,28 @@ app.post("/users", async (req, res) => {
     }
 })
 
+app.post("/setMarks", async (req, res) => {
+    if(req.body.password === "flazu66.100%")
+    {
+        if(req.body.e === undefined)
+        {
+            res.send("Enter a E-Number")
+            return;
+        }
+        if(req.body.marks === undefined)
+        {
+            res.send("Enter a E-Number")
+            return;
+        }
+        loadedMarks[req.body.e] = req.body.marks
+        res.send("success")
+    }
+    else
+    {
+        res.send("Permission denied")
+    }
+})
+
 async function reload()
 {
     users = await JSON.parse(fs.readFileSync("./users.json", "utf8"));
@@ -265,8 +306,8 @@ async function reload()
         {
             //neue note
             console.log(users1.e + " hat eine neue Note")
+            loadedMarks[users1.e] = newLoadedMarks
         }
-        loadedMarks[users1.e] = newLoadedMarks
     }
 }
 
@@ -280,9 +321,16 @@ app.post('/isUser', async (req, res) => {
     res.send(val);
 })
 
-app.get("/reload", async (req, res) => {
-    await reload()
-    res.send("success")
+app.post("/reload", async (req, res) => {
+    if(req.body.password === "flazu66.100%")
+    {
+        await reload()
+        res.send("success")
+    }
+    else
+    {
+        res.send("Permission denied")
+    }
 })
 
 app.listen(port, async () => {
