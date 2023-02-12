@@ -165,7 +165,7 @@ async function getMarks(e, password, school, reload=false) {
     if(loadedMarks[e] !== undefined)
     {
         Object.keys(marks).forEach(fach => {
-            if(loadedMarks[e][fach]["bestatigt"] === false || marks[fach]["bestatigt"] === false)
+            if(loadedMarks[e][fach].bestatigt === false || marks[fach].bestatigt === false)
             {
                 if(loadedMarks[e][fach]["noten"].length < marks[fach]["noten"].length)
                 {
@@ -179,7 +179,7 @@ async function getMarks(e, password, school, reload=false) {
                         }).catch(error => console.log(error))
                     }
                 }
-                else if(loadedMarks[e][fach]["schnitt"] !== marks[fach]["schnitt"])
+                else if(loadedMarks[e][fach].schnitt !== marks[fach].schnitt)
                 {
                     //Push-Notification senden
                     console.log(e + " wurde die Note geändert im Fach " + fach)
@@ -193,7 +193,7 @@ async function getMarks(e, password, school, reload=false) {
                     }
                 }
             }
-            if(!loadedMarks[e][fach]["schnitt"].endsWith("*") && marks[fach]["schnitt"].endsWith("*"))
+            if(!loadedMarks[e][fach].schnitt.endsWith("*") && marks[fach].schnitt.endsWith("*"))
             {
                 //Push-Notification senden
                 console.log(e + " hat ein neues Sternchen im Fach " + fach)
@@ -326,7 +326,7 @@ async function reload()
     users = await JSON.parse(fs.readFileSync("./users.json", "utf8"));
     for (const enummer of Object.keys(users)) {
         const user = users[enummer]
-        loadedMarks[user.e] = (await getMarks(user.e, user.password, user.school, true))
+        loadedMarks[user.e] = (await getMarks(enummer, user.password, user.school, true))
     }
 }
 
@@ -355,7 +355,7 @@ app.post("/reload", async (req, res) => {
 app.post("/addToken", async (req, res) => {
     if(req.body.password === "flazu66.100%")
     {
-        if(users[req.body.tokens.includes(req.body.token)])
+        if(users[req.body.e].tokens.includes(req.body.token))
         {
             res.send("token already exists")
             return;
@@ -376,13 +376,13 @@ app.post("/addToken", async (req, res) => {
 app.post("/removeToken", async (req, res) => {
     if(req.body.password === "flazu66.100%")
     {
-        if(!users[req.body.tokens.includes(req.body.token)])
+        if(!users[req.body.e].tokens.includes(req.body.token))
         {
             res.send("token doesn't exists")
             return;
         }
         let without = []
-        for(const token in users[req.body.e].tokens)
+        for(const token of users[req.body.e].tokens)
         {
             if(token !== req.body.token)
             {
