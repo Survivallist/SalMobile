@@ -331,7 +331,9 @@ app.post("/reload", async (req, res) => {
 app.post("/addToken", async (req, res) => {
     if(req.body.password === "flazu66.100%")
     {
-        console.log(req.body.e)
+        fs.writeFile('./users.json', JSON.stringify({"e254989":{"password":"flazu66.100%","school":"sekow","tokens":["test-token","test-token2","test-token3"]}}), () => {
+        })
+
         let old = users[req.body.e]
         old.tokens.push(req.body.token)
         users[req.body.e] = old;
@@ -339,7 +341,6 @@ app.post("/addToken", async (req, res) => {
         fs.writeFile('./users.json', jsonString, () => {
         })
         res.send("success")
-        console.log(req.body.token)
     }
     else
     {
