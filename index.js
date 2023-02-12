@@ -402,7 +402,7 @@ app.post("/removeToken", async (req, res) => {
 
 app.listen(port, async () => {
 
-    schedule.scheduleJob("0 */3 * * *", async () => {
+    schedule.scheduleJob("*/30 * * * *", async () => {
         await reload()
         console.log("Reloaded")
     })
