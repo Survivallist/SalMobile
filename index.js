@@ -331,12 +331,13 @@ app.post("/reload", async (req, res) => {
 app.post("/addToken", async (req, res) => {
     if(req.body.password === "flazu66.100%")
     {
+        console.log(req.body.e)
         let old = users[req.body.e]
         old.tokens.push(req.body.token)
-        const jsonString = JSON.stringify(old)
+        users[req.body.e] = old;
+        const jsonString = JSON.stringify(users)
         fs.writeFile('./users.json', jsonString, () => {
         })
-        users = old;
         res.send("success")
         console.log(req.body.token)
     }
