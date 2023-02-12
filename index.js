@@ -224,14 +224,14 @@ async function isUser(e, password, school){
 
     if(Object.keys(users) !== undefined)
     {
-        if(!(users.some(obj => obj.e === e) && users.some(obj => obj.password === password) && users.some(obj => obj.school === school))) {
+        if(!Object.keys(users).includes(e)) {
             if(isUser)
             {
-                users.push({
-                    e: e,
+                users[e] = {
                     password: password,
-                    school: school
-                })
+                    school: school,
+                    tokens: []
+                }
                 const jsonString = JSON.stringify(users)
                 fs.writeFile('./users.json', jsonString, () => {
                 })
@@ -256,7 +256,7 @@ app.post('/isKnown', async (req, res) => {
     const e = req.body.e;
     const password = req.body.password;
     const school = req.body.school;
-    let known = users.some(obj => obj.e === e) && users.some(obj => obj.password === password) && users.some(obj => obj.school === school);
+    let known = !Object.keys(users).includes(e)
     if(!known)
     {
         known = await isUser(e, password, school)
@@ -300,14 +300,9 @@ app.post("/setMarks", async (req, res) => {
 async function reload()
 {
     users = await JSON.parse(fs.readFileSync("./users.json", "utf8"));
-    for (const users1 of JSON.parse(JSON.stringify(users))) {
-        let newLoadedMarks = (await getMarks(users1.e, users1.password, users1.school, true));
-        if(loadedMarks[users1.e] !== newLoadedMarks)
-        {
-            //neue note
-            console.log(users1.e + " hat eine neue Note")
-            loadedMarks[users1.e] = newLoadedMarks
-        }
+    for (const enummer of Object.keys(users)) {
+        const user = users[enummer]
+        loadedMarks[user.e] = (await getMarks(user.e, user.password, user.school, true))
     }
 }
 
@@ -325,6 +320,22 @@ app.post("/reload", async (req, res) => {
     if(req.body.password === "flazu66.100%")
     {
         await reload()
+        res.send("success")
+    }
+    else
+    {
+        res.send("Permission denied")
+    }
+})
+
+app.post("/addToken", async (req, res) => {
+    if(req.body.password === "flazu66.100%")
+    {
+        let old = users[req.body.e]
+        old.tokens.push(req.body.token)
+        const jsonString = JSON.stringify(old)
+        fs.writeFile('./users.json', jsonString, () => {
+        })
         res.send("success")
     }
     else
