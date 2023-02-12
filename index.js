@@ -336,7 +336,9 @@ app.post("/addToken", async (req, res) => {
         const jsonString = JSON.stringify(old)
         fs.writeFile('./users.json', jsonString, () => {
         })
+        users = old;
         res.send("success")
+        console.log(req.body.token)
     }
     else
     {
