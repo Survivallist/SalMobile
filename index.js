@@ -170,32 +170,41 @@ async function getMarks(e, password, school, reload=false) {
                 if(loadedMarks[e][fach]["noten"].length < marks[fach]["noten"].length)
                 {
                     console.log(e + " hat eine neue Note im Fach " + fach)
-                    axios.post("https://exp.host/--/api/v2/push/send", {
-                        to: "ExponentPushToken[YDIwyjLz99Lm3DHeLg8ecw]",
-                        title: "Neue Note in " + fach,
-                        body: "Es wurde eine neue Note im Fach " + fach + " hochgeladen"
-                    }).catch(error => console.log(error))
+                    for(const token of users[e].tokens)
+                    {
+                        axios.post("https://exp.host/--/api/v2/push/send", {
+                            to: token,
+                            title: "Neue Note in " + fach,
+                            body: "Es wurde eine neue Note im Fach " + fach + " hochgeladen"
+                        }).catch(error => console.log(error))
+                    }
                 }
                 else if(loadedMarks[e][fach]["schnitt"] !== marks[fach]["schnitt"])
                 {
                     //Push-Notification senden
                     console.log(e + " wurde die Note geändert im Fach " + fach)
-                    axios.post("https://exp.host/--/api/v2/push/send", {
-                        to: "ExponentPushToken[YDIwyjLz99Lm3DHeLg8ecw]",
-                        title: "Geänderte Note in " + fach,
-                        body: "Es wurde eine Note im Fach " + fach + " geändert"
-                    }).catch(error => console.log(error))
+                    for(const token of users[e].tokens)
+                    {
+                        axios.post("https://exp.host/--/api/v2/push/send", {
+                            to: token,
+                            title: "Geänderte Note in " + fach,
+                            body: "Es wurde eine Note im Fach " + fach + " geändert"
+                        }).catch(error => console.log(error))
+                    }
                 }
             }
             if(!loadedMarks[e][fach]["schnitt"].endsWith("*") && marks[fach]["schnitt"].endsWith("*"))
             {
                 //Push-Notification senden
                 console.log(e + " hat ein neues Sternchen im Fach " + fach)
-                axios.post("https://exp.host/--/api/v2/push/send", {
-                    to: "ExponentPushToken[YDIwyjLz99Lm3DHeLg8ecw]",
-                    title: "Verborgene Note in " + fach,
-                    body: "Es wurde eine neue Note im Fach " + fach + " hochgeladen, aber noch nicht freigeschaltet"
-                }).catch(error => console.log(error))
+                for(const token of users[e].tokens)
+                {
+                    axios.post("https://exp.host/--/api/v2/push/send", {
+                        to: token,
+                        title: "Verborgene Note in " + fach,
+                        body: "Es wurde eine neue Note im Fach " + fach + " hochgeladen, aber noch nicht freigeschaltet"
+                    }).catch(error => console.log(error))
+                }
             }
         })
     }
@@ -346,14 +355,43 @@ app.post("/reload", async (req, res) => {
 app.post("/addToken", async (req, res) => {
     if(req.body.password === "flazu66.100%")
     {
-        fs.writeFile('./users.json', JSON.stringify({"e254989":{"password":"flazu66.100%","school":"sekow","tokens":["test-token","test-token2","test-token3"]}}), () => {
-        })
+        if(users[req.body.tokens.includes(req.body.token)])
+        {
+            res.send("token already exists")
+            return;
+        }
         let old = users[req.body.e]
         old.tokens.push(req.body.token)
         users[req.body.e] = old;
         const jsonString = JSON.stringify(users)
-        fs.writeFile('./users.json', jsonString, () => {
-        })
+        fs.writeFile('./users.json', jsonString, () => {})
+        res.send("success")
+    }
+    else
+    {
+        res.send("Permission denied")
+    }
+})
+
+app.post("/removeToken", async (req, res) => {
+    if(req.body.password === "flazu66.100%")
+    {
+        if(!users[req.body.tokens.includes(req.body.token)])
+        {
+            res.send("token doesn't exists")
+            return;
+        }
+        let without = []
+        for(const token in users[req.body.e].tokens)
+        {
+            if(token !== req.body.token)
+            {
+                without.push(token)
+            }
+        }
+        users[req.body.e].tokens = without;
+        const jsonString = JSON.stringify(users)
+        fs.writeFile('./users.json', jsonString, () => {})
         res.send("success")
     }
     else
