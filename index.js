@@ -398,11 +398,11 @@ app.post("/removeToken", async (req, res) => {
             return;
         }
         let without = []
-        for(const token of users[e].tokens)
+        for(const checkToken of users[e].tokens)
         {
-            if(token !== token)
+            if(checkToken !== token)
             {
-                without.push(token)
+                without.push(checkToken)
             }
         }
         users[e].tokens = without;
