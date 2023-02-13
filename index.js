@@ -5,6 +5,7 @@ const {convert} = require("html-to-text");
 const schedule = require("node-schedule");
 const fs = require("fs")
 const axios = require("axios");
+const {Base64} = require("js-base64");
 
 const port = 3000;
 
@@ -272,8 +273,8 @@ async function isUser(e, password, school){
 }
 
 app.post('/getMarks', async (req, res) => {
-    const e = req.body.e;
-    const password = req.body.password;
+    const e = Base64.decode(req.body.e);
+    const password = Base64.decode(req.body.password);
     const school = req.body.school;
 
     let marks = await getMarks(e, password, school)
@@ -282,8 +283,8 @@ app.post('/getMarks', async (req, res) => {
 })
 
 app.post('/isKnown', async (req, res) => {
-    const e = req.body.e;
-    const password = req.body.password;
+    const e = Base64.decode(req.body.e);
+    const password = Base64.decode(req.body.password);
     const school = req.body.school;
     let known = Object.keys(users).includes(e)
     if(known)
@@ -340,8 +341,8 @@ async function reload()
 }
 
 app.post('/isUser', async (req, res) => {
-    const e = req.body.e;
-    const password = req.body.password;
+    const e = Base64.decode(req.body.e);
+    const password = Base64.decode(req.body.password);
     const school = req.body.school;
 
     let val = await isUser(e, password, school);
@@ -362,16 +363,19 @@ app.post("/reload", async (req, res) => {
 })
 
 app.post("/addToken", async (req, res) => {
-    if(req.body.password === "flazu66.100%")
+    const e = Base64.decode(req.body.e)
+    const password = Base64.decode(req.body.password)
+    const token = Base64.decode(req.body.token)
+    if(password === "flazu66.100%")
     {
-        if(users[req.body.e].tokens.includes(req.body.token))
+        if(users[e].tokens.includes(token))
         {
             res.send("token already exists")
             return;
         }
-        let old = users[req.body.e]
-        old.tokens.push(req.body.token)
-        users[req.body.e] = old;
+        let old = users[e]
+        old.tokens.push(token)
+        users[e] = old;
         const jsonString = JSON.stringify(users)
         fs.writeFile('./users.json', jsonString, () => {})
         res.send("success")
@@ -383,22 +387,25 @@ app.post("/addToken", async (req, res) => {
 })
 
 app.post("/removeToken", async (req, res) => {
-    if(req.body.password === "flazu66.100%")
+    const e = Base64.decode(req.body.e)
+    const password = Base64.decode(req.body.password)
+    const token = Base64.decode(req.body.token)
+    if(password === "flazu66.100%")
     {
-        if(!users[req.body.e].tokens.includes(req.body.token))
+        if(!users[e].tokens.includes(token))
         {
             res.send("token doesn't exists")
             return;
         }
         let without = []
-        for(const token of users[req.body.e].tokens)
+        for(const token of users[e].tokens)
         {
-            if(token !== req.body.token)
+            if(token !== token)
             {
                 without.push(token)
             }
         }
-        users[req.body.e].tokens = without;
+        users[e].tokens = without;
         const jsonString = JSON.stringify(users)
         fs.writeFile('./users.json', jsonString, () => {})
         res.send("success")
