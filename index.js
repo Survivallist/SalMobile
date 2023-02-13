@@ -169,7 +169,6 @@ async function getMarks(e, password, school, reload=false) {
             {
                 if(loadedMarks[e][fach]["noten"].length < marks[fach]["noten"].length)
                 {
-                    console.log(e + " hat eine neue Note im Fach " + fach)
                     for(const token of users[e].tokens)
                     {
                         axios.post("https://exp.host/--/api/v2/push/send", {
@@ -182,7 +181,6 @@ async function getMarks(e, password, school, reload=false) {
                 else if(loadedMarks[e][fach].schnitt !== marks[fach].schnitt)
                 {
                     //Push-Notification senden
-                    console.log(e + " wurde die Note geändert im Fach " + fach)
                     for(const token of users[e].tokens)
                     {
                         axios.post("https://exp.host/--/api/v2/push/send", {
@@ -196,7 +194,6 @@ async function getMarks(e, password, school, reload=false) {
             if(!loadedMarks[e][fach].schnitt.endsWith("*") && marks[fach].schnitt.endsWith("*"))
             {
                 //Push-Notification senden
-                console.log(e + " hat ein neues Sternchen im Fach " + fach)
                 for(const token of users[e].tokens)
                 {
                     axios.post("https://exp.host/--/api/v2/push/send", {
@@ -280,7 +277,11 @@ app.post('/isKnown', async (req, res) => {
     const e = req.body.e;
     const password = req.body.password;
     const school = req.body.school;
-    let known = !Object.keys(users).includes(e)
+    let known = Object.keys(users).includes(e)
+    if(known)
+    {
+        known = users[e].password === req.body.password;
+    }
     if(!known)
     {
         known = await isUser(e, password, school)
