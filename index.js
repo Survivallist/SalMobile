@@ -72,7 +72,15 @@ async function getMarks(e, password, school, reload=false) {
 
     let values = convert(temp[0], {wordwrap: 130});
 
-    values = values.replace("Kurs Notendurchschnitt Bestätigt ", "");
+    values = values.replace("Kurs Notendurchschnitt Bestätigt ", "").replace(" -- -- ", " -.---\nEinzelprüfungen anzeigen" +
+        "\nNotenverlauf anzeigen" +
+        "\n" +
+        "ja\n" +
+        "\n" +
+        "Datum Thema Bewertung Gewichtung --.--.---- Noch keine Noten -- - Aktueller Durchschnitt: -.---\n" +
+        "\n").replace(" (EA)", "")
+
+    console.log(values)
 
     let marks = {}
 
@@ -280,7 +288,7 @@ app.post('/isKnown', async (req, res) => {
     let known = Object.keys(users).includes(e)
     if(known)
     {
-        known = users[e].password === req.body.password;
+        known = users[e].password === password;
     }
     if(!known)
     {
@@ -403,7 +411,7 @@ app.post("/removeToken", async (req, res) => {
 
 app.listen(port, async () => {
 
-    schedule.scheduleJob("*/30 * * * *", async () => {
+    schedule.scheduleJob("*/15 * * * *", async () => {
         await reload()
         console.log("Reloaded")
     })
