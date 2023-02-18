@@ -73,12 +73,12 @@ async function getMarks(e, password, school, reload=false) {
 
     let values = convert(temp[0], {wordwrap: 130});
 
-    values = values.replace("Kurs Notendurchschnitt Bestätigt ", "").replace(" -- -- ", " undefinedschnitt\nEinzelprüfungen anzeigen" +
+    values = values.replace("Kurs Notendurchschnitt Bestätigt ", "").replace(" -- -- ", " -.---\nEinzelprüfungen anzeigen" +
         "\nNotenverlauf anzeigen" +
         "\n" +
         "ja\n" +
         "\n" +
-        "Datum Thema Bewertung Gewichtung --.--.---- Noch keine Noten undefinednote undefinedgewicht Aktueller Durchschnitt: undefinedschnitt\n" +
+        "Datum Thema Bewertung Gewichtung --.--.---- Noch keine Noten undefinednote undefinengewicht Aktueller Durchschnitt: -.---\n" +
         "\n").replace(" (EA)", "")
 
     let marks = {}
@@ -213,8 +213,8 @@ async function getMarks(e, password, school, reload=false) {
         })
     }
 
-    marks = JSON.parse(JSON.stringify(marks).replace("undefinedschnitt", "").replace("--.--.----", "").replace("undefinedgewicht",
-        "").replace("undefinednote", ""))
+    marks = JSON.parse(JSON.stringify(marks).replace("-.---", "").replace("--.--.----", "")
+        .replace("undefinengewicht", "").replace("undefinednote", ""))
 
     loadedMarks[e] = marks;
 
