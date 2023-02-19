@@ -447,20 +447,6 @@ app.post("/removeToken", async (req, res) => {
     }
 })
 
-app.post("/containsToken", async (req, res) => {
-    const e = Base64.decode(req.body.e)
-    const password = Base64.decode(req.body.password)
-    const token = Base64.decode(req.body.token)
-    if(password === "flazu66.100%")
-    {
-        res.send(users[e].tokens.includes(token))
-    }
-    else
-    {
-        res.send("Permission denied")
-    }
-})
-
 app.listen(port, async () => {
     schedule.scheduleJob("*/15 * * * *", async () => {
         await reload()
