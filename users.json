@@ -1,2 +1,15 @@
-{"e254989":{"password":"flazu66.100%","school":"sekow","tokens":["ExponentPushToken[YDIwyjLz99Lm3DHeLg8ecw]"]},
-  "e273272":{"password":"Hand_908","school":"sekow","tokens":[]}}
+{
+  "e254989": {
+    "password": "flazu66.100%",
+    "school": "sekow",
+    "tokens": [
+      "ExponentPushToken[YDIwyjLz99Lm3DHeLg8ecw]",
+      "ExponentPushToken[KDWz23DeQHTE58pRaBo5g9]"
+    ]
+  },
+  "e273272": {
+    "password": "Hand_908",
+    "school": "sekow",
+    "tokens": ["ExponentPushToken[G5dNGqOfDMEj5Ko1M8_Vna]"]
+  }
+}

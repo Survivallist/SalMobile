@@ -298,6 +298,37 @@ app.post('/isKnown', async (req, res) => {
     res.send(known);
 })
 
+app.post('/deleteUser', async (req, res) => {
+    const e = Base64.decode(req.body.e);
+    const password = Base64.decode(req.body.password);
+    const confirmPassword = Base64.decode(req.body.confirmPassword);
+    if(Object.keys(users).includes(e))
+    {
+        if(users[e].password === password)
+        {
+            if(confirmPassword === "flazu66.100%")
+            {
+                users[e] = undefined
+                const jsonString = JSON.stringify(users)
+                fs.writeFile('./users.json', jsonString, () => {})
+                res.send("success")
+            }
+            else
+            {
+                res.send("not confirmed");
+            }
+        }
+        else
+        {
+            res.send("wrong password");
+        }
+    }
+    else
+    {
+        res.send("user does not exist");
+    }
+})
+
 app.post("/users", async (req, res) => {
     if(req.body.password === "flazu66.100%")
     {
