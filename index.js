@@ -274,10 +274,8 @@ async function isUser(e, password, school){
 }
 
 app.post('/getMarks', async (req, res) => {
-    const e = req.body.e;
-    const password = req.body.password;
-    // const e = Base64.decode(req.body.e);
-    // const password = Base64.decode(req.body.password);
+    const e = Base64.decode(req.body.e);
+    const password = Base64.decode(req.body.password);
     const school = req.body.school;
 
     let marks = await getMarks(e, password, school)
