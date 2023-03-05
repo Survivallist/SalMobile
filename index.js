@@ -153,13 +153,14 @@ async function getMarks(e, password, school, reload=false) {
     }
 
     let active;
-
+    let index = 0
     values.split("\n\n").forEach(section => {
         if(!section.startsWith("Datum"))
         {
             const details = getDetails(section);
-            marks[details["fach"]] = {"schnitt": details["schnitt"], "bestatigt": details["bestatigt"]};
+            marks[details["fach"]] = {"schnitt": details["schnitt"], "bestatigt": details["bestatigt"], "index": index};
             active = details["fach"];
+            index += 1;
         }
         else
         {
@@ -273,8 +274,10 @@ async function isUser(e, password, school){
 }
 
 app.post('/getMarks', async (req, res) => {
-    const e = Base64.decode(req.body.e);
-    const password = Base64.decode(req.body.password);
+    const e = req.body.e;
+    const password = req.body.password;
+    // const e = Base64.decode(req.body.e);
+    // const password = Base64.decode(req.body.password);
     const school = req.body.school;
 
     let marks = await getMarks(e, password, school)
@@ -416,6 +419,86 @@ app.post("/addToken", async (req, res) => {
         res.send("Permission denied")
     }
 })
+
+app.post("/bestatigen", async (req, res) => {
+    // const e = Base64.decode(req.body.e)
+    // const password = Base64.decode(req.body.password)
+    // const fach = Base64.decode(req.body.fach)
+    const e = req.body.e
+    const password = req.body.password
+    const fach = req.body.fach
+
+    if(users[e].password === password)
+    {
+        res.send(await bestatigen(e, fach))
+    }
+    else
+    {
+        res.send("Permission denied")
+    }
+})
+
+async function bestatigen(e, fach)
+{
+    const browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox']
+    });
+    const page = await browser.newPage();
+
+    await page.goto("https://sal.portal.bl.ch/" + users[e].school + "/index.php?login");
+
+    await page.type("[name=isiwebuserid]", e);
+    await page.type("[name=isiwebpasswd]", users[e].password);
+
+    await page.click("[type=submit]");
+
+    await page.waitForSelector(" img")
+
+    if (page.url() === "https://sal.portal.bl.ch/" + users[e].school + "/index.php?login")
+    {
+        return "failed";
+    }
+    //index.php?pageid=21311&action=nvw_bestaetigen&id=0b67589cf75cb494&transid=8f7450&listindex=0')">bestätigen
+    await page.click("[id=menu21311]");
+
+    await new Promise(r => setTimeout(r, 2000))
+
+    if (!page.url().includes("pageid=21311"))
+    {
+        return "failed";
+    }
+
+    let temp = await page.evaluate(() => {
+        let array = []
+        let element = document.getElementsByClassName('mdl-data-table mdl-js-data-table mdl-table--listtable')[0];
+        array.push(element.innerHTML)
+
+        return array;
+    });
+    let container = temp[0];
+
+    if(!container.includes("bestätigen"))
+    {
+        return "failed";
+    }
+
+    let link = container.split("<a href=\"")[1].
+        split("')\">bestätigen</a>")[0].replaceAll("&amp;", "&").split("','", )[1].replace(")", "")
+
+    link = link.replace("listindex=" + link.split("listindex=")[1], "listindex=")
+
+    link += loadedMarks[e][fach].index
+
+    await page.goto("https://sal.portal.bl.ch/" + users[e].school + "/" + link)
+
+    await page.close()
+    await browser.close()
+
+    return "success"
+}
+
+
 
 app.post("/removeToken", async (req, res) => {
     const e = Base64.decode(req.body.e)
