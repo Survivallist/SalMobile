@@ -419,12 +419,9 @@ app.post("/addToken", async (req, res) => {
 })
 
 app.post("/bestatigen", async (req, res) => {
-    // const e = Base64.decode(req.body.e)
-    // const password = Base64.decode(req.body.password)
-    // const fach = Base64.decode(req.body.fach)
-    const e = req.body.e
-    const password = req.body.password
-    const fach = req.body.fach
+    const e = Base64.decode(req.body.e)
+    const password = Base64.decode(req.body.password)
+    const fach = Base64.decode(req.body.fach)
 
     if(users[e].password === password)
     {
