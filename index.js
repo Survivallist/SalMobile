@@ -490,6 +490,8 @@ async function bestatigen(e, fach)
     await page.close()
     await browser.close()
 
+    loadedMarks[e][fach].bestatigt = true
+
     return "success"
 }
 
