@@ -435,6 +435,8 @@ app.post("/bestatigen", async (req, res) => {
 
 async function bestatigen(e, fach)
 {
+    loadedMarks[e][fach].bestatigt = true
+
     const browser = await puppeteer.launch({
         headless: true,
         args: ['--no-sandbox']
@@ -489,8 +491,6 @@ async function bestatigen(e, fach)
 
     await page.close()
     await browser.close()
-
-    loadedMarks[e][fach].bestatigt = true
 
     return "success"
 }
