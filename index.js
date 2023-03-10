@@ -456,7 +456,6 @@ async function bestatigen(e, fach)
     {
         return "failed";
     }
-    //index.php?pageid=21311&action=nvw_bestaetigen&id=0b67589cf75cb494&transid=8f7450&listindex=0')">bestätigen
     await page.click("[id=menu21311]");
 
     await new Promise(r => setTimeout(r, 2000))
