@@ -13,6 +13,8 @@ app.use(express.json());
 
 let users = JSON.parse(fs.readFileSync("./users.json", "utf8"));
 
+let timetables = JSON.parse(fs.readFileSync("./timetable.json", "utf8"));
+
 let loadedMarks = {}
 
 async function getMarks(e, password, school, reload=false) {
@@ -494,8 +496,6 @@ async function bestatigen(e, fach)
     return "success"
 }
 
-
-
 app.post("/removeToken", async (req, res) => {
     const e = Base64.decode(req.body.e)
     const password = Base64.decode(req.body.password)
@@ -526,11 +526,147 @@ app.post("/removeToken", async (req, res) => {
     }
 })
 
+async function getTimeTable(e, password, school) {
+
+    const browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox']
+    });
+    const page = await browser.newPage();
+
+    await page.goto("https://sal.portal.bl.ch/" + school + "/index.php?login");
+
+    if(e !== undefined && e !== null && password !== undefined && password !== null)
+    {
+        await page.type("[name=isiwebuserid]", e);
+        await page.type("[name=isiwebpasswd]", password);
+    }
+    else
+    {
+        return "failed";
+    }
+
+    await page.click("[type=submit]");
+
+    await page.waitForSelector(" img")
+
+    if (page.url() === "https://sal.portal.bl.ch/" + school + "/index.php?login")
+    {
+        return "failed";
+    }
+
+    await page.click("[id=menu21200]");
+
+    await new Promise(r => setTimeout(r, 1500))
+
+    await page.click("[id=menu-toggle-button]")
+
+    await new Promise(r => setTimeout(r, 500))
+
+    if (!page.url().includes("pageid=21200"))
+    {
+        return "failed";
+    }
+
+    await page.click("[id=cls_pageid_nav_22202]");
+
+    await new Promise(r => setTimeout(r, 1000))
+
+    await page.click("[id=view_button]");
+
+    await new Promise(r => setTimeout(r, 1000))
+
+    await page.click("[id=grid_button]");
+
+    await new Promise(r => setTimeout(r, 500))
+
+    await new Promise(r => setTimeout(r, 5000))
+
+    await page.screenshot({path: "./pic.png"})
+
+    let temp = await page.evaluate(() => {
+        let data = [];
+        let elements = document.querySelectorAll('.dhx_grid_event,.stpt_event');
+        for (let element of elements)
+            data.push(element.innerHTML);
+        return data;
+    });
+
+
+
+    let timetable = {}
+    for(let ereignis of temp)
+    {
+        let infoArray = ereignis.replaceAll("<td role=\"gridcell\" style=\"width:134px;text-align:left\">", "")
+            .replaceAll("<td role=\"gridcell\" style=\"width:37px;text-align:left\">", "")
+            .replaceAll("<td role=\"gridcell\" style=\"width:136px;text-align:left\">", "").split("</td>")
+        let info = {}
+        info["start"] = dateToMillis(infoArray[0])
+        info["end"] = dateToMillis(infoArray[1])
+        info["room"] = infoArray[2]
+        info["teachers"] = infoArray[3]
+        info["ereignis"] = infoArray[4].replaceAll("&gt;", ">")
+        if(timetable[info.start] === undefined)
+        {
+            timetable[info.start] = []
+        }
+        timetable[info.start].push(info)
+    }
+
+    timetables[e] = timetable
+    const jsonString = JSON.stringify(timetables)
+    fs.writeFile('./timetable.json', jsonString, () => {
+    })
+}
+
+const reloadTimetable = async () => {
+    for (const enummer of Object.keys(users)) {
+        const user = users[enummer]
+        await getTimeTable(enummer, user.password, user.school)
+    }
+}
+
+const dateToMillis = date => {
+    let string = date.substring(6, 10) + "-" + date.substring(3, 5) + "-" + date.substring(0, 2) + "T" + date.substring(11, 13) + ":" + date.substring(14, 16) +
+        ":00"
+    let newDate = new Date(string)
+    return newDate.getTime()
+}
+
+app.post("/getTimeTable", async (req, res) => {
+    const e = req.body.e
+    const password = req.body.password
+    const start = parseInt(req.body.start)
+    const end = parseInt(req.body.end)
+    if(password === "flazu66.100%")
+    {
+        let data = []
+        for (let time of Object.keys(timetables[e]))
+        {
+            if(parseInt(time) >= start && parseInt(time) <= end)
+            {
+                data.push(timetables[e][time])
+            }
+        }
+        res.send(data)
+    }
+    else
+    {
+        res.send("Permission denied")
+    }
+})
+
+
 app.listen(port, async () => {
-    schedule.scheduleJob("*/15 * * * *", async () => {
+    schedule.scheduleJob("*/30 * * * *", async () => { //https://crontab.guru/examples.html
         await reload()
-        console.log("Reloaded")
+        console.log("Reloaded Marks")
+    })
+    schedule.scheduleJob("0 0 * * *", async () => {
+        await reloadTimetable()
+        console.log("Reloaded TimeTable")
     })
     await reload()
+    await reloadTimetable()
     console.log("Server listening on port " + port);
 });
