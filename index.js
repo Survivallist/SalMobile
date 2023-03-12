@@ -634,8 +634,8 @@ const dateToMillis = date => {
 }
 
 app.post("/getTimeTable", async (req, res) => {
-    const e = req.body.e
-    const password = req.body.password
+    const e = Base64.decode(req.body.e)
+    const password = Base64.decode(req.body.password)
     const start = parseInt(req.body.start)
     const end = parseInt(req.body.end)
     if(password === "flazu66.100%")
