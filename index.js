@@ -570,7 +570,7 @@ async function getTimeTable(e, password, school) {
 
     await page.click("[id=cls_pageid_nav_22202]");
 
-    await new Promise(r => setTimeout(r, 1000))
+    await new Promise(r => setTimeout(r, 2000))
 
     await page.click("[id=view_button]");
 
