@@ -650,7 +650,6 @@ app.post("/getTimeTable", async (req, res) => {
     const password = Base64.decode(req.body.password)
     const start = parseInt(req.body.start)
     const end = parseInt(req.body.end)
-    console.log(e + " " + password + " " + start + " " + end)
     if(password === "flazu66.100%")
     {
         let data = []
