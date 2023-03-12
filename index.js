@@ -633,6 +633,18 @@ const dateToMillis = date => {
     return newDate.getTime()
 }
 
+app.post("/timetables", async (req, res) => {
+    const password = req.body.password
+    if(password === "flazu66.100%")
+    {
+        res.send(timetables)
+    }
+    else
+    {
+        res.send("Permission denied")
+    }
+})
+
 app.post("/getTimeTable", async (req, res) => {
     const e = Base64.decode(req.body.e)
     const password = Base64.decode(req.body.password)
